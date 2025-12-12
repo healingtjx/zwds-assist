@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <!-- 中文注释：设置 viewport，禁止移动端双击/缩放以避免布局被破坏 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>紫微斗术在线排盘｜生成AI提示词</title>
+    <link rel="stylesheet" href="./assets/style.css" />
+    <!-- 中文注释：引入 Air Datepicker 的样式与脚本 -->
+    <link rel="stylesheet" href="./assets/air-datepicker.css" />
+    <script src="./assets/air-datepicker.js"></script>
+    <!-- 通过 CDN 引入 iztro UMD 库，用于紫微斗数排盘计算 -->
+    <script src="./assets/iztro.min.js"></script>
+  </head>
+  <body>
+    <header class="header">
+      <h1>紫微斗术在线排盘（生成AI提示词）</h1>
+    </header>
+
+    <main class="container">
+      <!-- 结果：概览与宫格 -->
+      <section class="panel result-panel">
+        <div id="overview" class="overview">
+          
+        </div>
+        <div id="grid" class="grid">
+          
+        </div>
+      </section>
+
+      <!-- 表单：用于收集出生信息 -->
+      <section class="panel form-panel">
+        <form id="astrolabe-form">
+          <!-- 日期类型选择 -->
+          <div class="form-row">
+            <label>日期类型</label>
+            <div class="segmented">
+              <label><input type="radio" name="dateType" value="solar" checked /> 阳历</label>
+              <label><input type="radio" name="dateType" value="lunar" /> 农历</label>
+            </div>
+          </div>
+
+          <!-- 阳历日期输入（默认显示） -->
+          <div class="form-row" id="solar-row">
+            <label for="solarDate">阳历生日</label>
+            <!-- 中文注释：文本输入用于挂载 Air Datepicker；移动端禁用键盘，仅通过弹窗选择 -->
+            <input id="solarDate" name="solarDate" type="text" required placeholder="请选择阳历生日" readonly inputmode="none" autocomplete="off" />
+          </div>
+
+          <!-- 农历日期输入（切换后显示） -->
+          <div class="form-row hidden" id="lunar-row">
+            <label for="lunarDate">农历生日</label>
+            <input id="lunarDate" name="lunarDate" type="text" placeholder="示例：2000-7-17" />
+            <label class="inline"><input id="isLeapMonth" type="checkbox" /> 是否闰月</label>
+          </div>
+
+          <!-- 时辰选择（子到亥） -->
+          <div class="form-row">
+            <label for="hourIndex">时辰</label>
+            <select id="hourIndex" name="hourIndex">
+              <option value="0">子时 (23:00-01:00)</option>
+              <option value="1">丑时 (01:00-03:00)</option>
+              <option value="2">寅时 (03:00-05:00)</option>
+              <option value="3">卯时 (05:00-07:00)</option>
+              <option value="4">辰时 (07:00-09:00)</option>
+              <option value="5">巳时 (09:00-11:00)</option>
+              <option value="6">午时 (11:00-13:00)</option>
+              <option value="7">未时 (13:00-15:00)</option>
+              <option value="8">申时 (15:00-17:00)</option>
+              <option value="9">酉时 (17:00-19:00)</option>
+              <option value="10">戌时 (19:00-21:00)</option>
+              <option value="11">亥时 (21:00-23:00)</option>
+            </select>
+          </div>
+
+          <!-- 性别选择 -->
+          <div class="form-row">
+            <label for="gender">性别</label>
+            <select id="gender" name="gender">
+              <option value="男">男</option>
+              <option value="女">女</option>
+            </select>
+          </div>
+
+          <!-- 占卜范围选择 -->
+          <div class="form-row" id="divtype-row">
+            <label>范围</label>
+            <div class="segmented">
+              <label><input type="radio" name="divType" value="life" checked> 人生</label>
+              <label><input type="radio" name="divType" value="decadal"> 大限</label>
+              <label><input type="radio" name="divType" value="year"> 流年</label>
+            </div>
+          </div>
+
+          <!-- 大限选择（两排正方形） -->
+          <div class="form-row hidden" id="decadal-picker-row">
+            <label>选择大限</label>
+            <div id="decadalPicker" class="grid-picker"></div>
+          </div>
+
+          <!-- 流年选择（两排正方形） -->
+          <div class="form-row hidden" id="year-picker-row">
+            <label>选择流年</label>
+            <div id="yearPicker" class="grid-picker"></div>
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="form-actions">
+              <button type="submit" class="btn primary">排盘并分析</button>
+          </div>
+
+         <div class="call-word">
+           <!-- 中文注释：提示词复制区（单行 + 多行滚动） -->
+           <div class="copyblock">
+             <h3>第一步:给AI设置身份</h3>
+             <!-- 中文注释：单行输入框 + 复制按钮 -->
+             <div class="copyline">
+               <input id="copyLine" class="copy-input" type="text" value="你是一名紫薇斗术的算命师，你需要帮助用户解答心里的疑惑" />
+               <button id="copyLineBtn" type="button" class="btn">复制</button>
+             </div>
+             <p class="sub">点击右侧「复制」后，将提示词粘贴到你的 AI 对话框</p>
+           </div>
+ 
+           <div class="copyblock" style="margin-top: 16px;">
+             <h3>第二步:给AI你的命盘</h3>
+             <!-- 中文注释：多行文本域，限制高度可滚动 -->
+             <textarea id="copyBlock" class="copy-area"></textarea>
+              <div class="actions actions-inline">
+               <p class="sub">「复制」将提示词到你的 AI 对话框</p>
+               <button id="copyBlockBtn" type="button" class="btn cpyeBtn">复制</button>
+
+             </div>
+           <div class="copyblock" style="margin-top: 16px;">
+             <h3>第三步:选择你的重点方向</h3>
+             <!-- 中文注释：主题选择（婚姻、事业、财运、健康、学业），点击切换并填充预设提示词到独立文本框 -->
+             <div id="topicPicker" class="grid-picker">
+               <div class="pick-item active" data-topic="婚姻">婚姻</div>
+               <div class="pick-item" data-topic="事业">事业</div>
+               <div class="pick-item" data-topic="财运">财运</div>
+               <div class="pick-item" data-topic="健康">健康</div>
+               <div class="pick-item" data-topic="学业">学业</div>
+             </div>
+             <p class="sub">也可以自己想问AI其他问题</p>
+             <!-- 中文注释：第三步独立文本框 + 复制按钮 -->
+             <textarea id="copyTopic" class="copy-area"></textarea>
+             <div class="actions actions-inline">
+               <p class="sub">「复制」将提示词到你的 AI 对话框</p>
+               <button id="copyTopicBtn" type="button" class="btn cpyeBtn">复制</button>
+             </div>
+           </div>
+         </div>
+
+
+        </form>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>数据引擎： </span><a target="_blank" href="https://docs.iztro.com/">iztro</a>
+    </footer>
+
+    <script src="./assets/app.js"></script>
+  </body>
+  </html>

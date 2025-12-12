@@ -1,0 +1,361 @@
+/*
+ * 页面基础样式（中文注释）：
+ * - 布局：上方表单、右侧结果区域，下方页脚
+ * - 主题：简洁清晰，突出信息展示
+ */
+
+:root {
+  /* 轻柔浅色主题，参考紫微派页面 */
+  --bg: #f7f8f3;
+  --panel: #ffffff;
+  --text: #24303f;
+  --muted: #7b8a9a;
+  --primary: #5b35f6;
+  --accent: #3bb37f;
+  --border: #e4e7eb;
+  --shadow: rgba(0,0,0,0.06);
+  /* 中文注释：内容最大宽度与两侧边距（响应式） */
+  --content-max: 1440px;
+  --side-pad-min: 40px;
+  --side-pad-max: 120px;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #f7f8f3 0%, #f4f7ed 100%);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, PingFang SC, Hiragino Sans GB, "Microsoft YaHei", sans-serif;
+  min-width: 1400px;
+  /* 中文注释：左右边距采用 clamp，自适应不同浏览器/分辨率 */
+  padding-inline: clamp(var(--side-pad-min), 5vw, var(--side-pad-max));
+}
+
+.header { 
+  /* 中文注释：头部与主容器宽度保持一致（移除自定义宽度计算），使用同样的居中与最大宽度策略 */
+  text-indent: 5px;
+  padding: 10px; 
+  border-bottom: 1px solid var(--border); 
+  background: var(--panel); 
+  border: 1px solid var(--border);
+  border-radius: 10px; 
+  margin: 0 auto; 
+  max-width: calc(var(--content-max) - 32px);
+  /* 中文注释：为与 .container 的左右 padding:16px 对齐，头部视觉宽度需要扣除 32px */
+  width: calc(100% - 32px);
+}
+.header h1 { margin: 0 0 8px; font-size: 22px; }
+.header .sub { margin: 0; color: var(--muted); }
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 16px;
+  padding: 16px;
+  /* 中文注释：限制容器最大宽度，居中显示，确保左右留白充足 */
+  max-width: var(--content-max);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 1px 6px var(--shadow);
+}
+
+.form-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.form-row label { width: 84px; color: var(--muted); }
+.form-row .inline { width: auto; }
+.form-row input[type="date"],
+.form-row input[type="text"],
+.form-row select {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #f7fafc;
+  color: var(--text);
+}
+/* 中文注释：只读输入在移动端展示为可点击状态，提示可打开日期选择器 */
+.form-row input[readonly] { cursor: pointer; }
+
+.segmented { display: flex; gap: 16px; }
+.segmented label { cursor: pointer; }
+.hidden { display: none; }
+
+.form-actions { display: flex; gap: 10px; margin-top: 8px; }
+.btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #f6f2ff;
+  color: var(--text);
+  cursor: pointer;
+}
+.btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn:hover { filter: brightness(1.1); }
+
+/* 让“排盘”按钮单行占满容器宽度 */
+.form-actions .btn.primary { display: block; width: 100%; }
+
+.result-panel { display: grid; grid-template-rows: auto 1fr; gap: 12px; }
+
+.overview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.kv { display: flex; gap: 8px; align-items: baseline; border-bottom: 1px dashed var(--border); padding-bottom: 4px; }
+.kv .k { color: var(--muted); width: 84px; }
+.kv .v { flex: 1; }
+
+.grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  /* 中文注释：采用最小高度 + 内容自适应，减少单元格底部空白 */
+  grid-auto-rows: minmax(150px, auto);
+  gap: 8px;
+}
+
+/* 三方四正虚线覆盖层 */
+.sanfang-lines { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+.sanfang-lines .sf-path { stroke: #b38b8b; stroke-width: 2; stroke-dasharray: 10 6; fill: none; opacity: 0.85; }
+.sanfang-lines .sf-point { fill: #b38b8b; stroke: #ffffff; stroke-width: 1.2; }
+.sanfang-lines .sf-anchor { fill: #b38b8b; stroke: #ffffff; stroke-width: 1.2; }
+
+.cell {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  /* 中文注释：减少内边距以降低单宫块总体高度，字体保持不变 */
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  /* 中文注释：降低各行之间的间距以压缩垂直空间 */
+  gap: 4px;
+  background: #ffffff;
+  /* 中文注释：略微减小行高，确保不改变字体大小的情况下提升信息密度 */
+  line-height: 1.25;
+}
+.cell.spacer { background: transparent; border-color: transparent; box-shadow: none; }
+.cell.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(59, 179, 127, 0.25) inset; background: #f6fffa; }
+.cell.xiaoxian-active,
+.cell.age-active { /* 保留类用于逻辑识别，不再强制改变边框 */ }
+.tag-xiaoxian {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #ffffff !important;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(91, 53, 246, 0.18);
+  font-weight: 600;
+}
+.cell .title { display: flex; align-items: center; gap: 6px; }
+.cell .title { font-weight: 600; color: #506070; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+/* 中文注释：减少标题与内容的间距 */
+.cell .meta { display: flex; flex-wrap: wrap; gap: 4px; }
+.cell .title { font-weight: 600; }
+/* 中文注释：缩小标签与星曜的内边距与间距，以降低总高度 */
+.tag { display: inline-block; padding: 1px 4px; border-radius: 6px; border: 1px solid var(--border); color: var(--muted); margin-right: 4px; font-size: 12px; background: #f8fafc; }
+.stars { display: flex; flex-wrap: wrap; gap: 4px; }
+.stars .star { padding: 1px 4px; border-radius: 6px; background: #f3f6fa; border: 1px solid var(--border); font-size: 12px; }
+
+/* 四化标签行（中文注释：减小间距与内边距以压缩高度） */
+.mut-row { display: flex; gap: 4px; margin: 2px 0 4px; }
+.mut-tag { display: inline-block; padding: 1px 4px; border-radius: 10px; font-size: 12px; border: 1px solid var(--border); }
+.mut-lu { background: #fff8e6; border-color: #ffe7ae; color: #8a6a1f; }
+.mut-quan { background: #eaf2ff; border-color: #cfe0ff; color: #21498a; }
+.mut-ke { background: #e9fff4; border-color: #c9f5df; color: #1d7f52; }
+.mut-ji { background: #fff0f0; border-color: #ffd9d9; color: #a83232; }
+
+/* 星曜类型颜色标签 */
+.star.major { background: #eaf2ff; border-color: #cfe0ff; color: #21498a; }
+.star.soft { background: #e9fff4; border-color: #c9f5df; color: #1d7f52; }
+.star.tough { background: #fff0f0; border-color: #ffd9d9; color: #a83232; }
+.star.tianma { background: #f5eaff; border-color: #e2d1ff; color: #6a36b8; }
+.star.helper { background: #f0fbff; border-color: #d5f0ff; color: #2a6b88; }
+.star.flower { background: #fff7ea; border-color: #ffe7bf; color: #8a5a21; }
+.star.adjective { background: #f6f6f6; border-color: #e8e8e8; color: #666; }
+
+/* 亮度标记 */
+.star.b-miao { box-shadow: inset 0 0 0 1px #7ac77a; }
+.star.b-wang { box-shadow: inset 0 0 0 1px #a0d07a; }
+.star.b-ping { box-shadow: inset 0 0 0 1px #9aa4b2; }
+.star.b-xian { box-shadow: inset 0 0 0 1px #e38b8b; }
+.star.b-de { box-shadow: inset 0 0 0 1px #6fb3ff; }
+
+/* 中央概览覆盖层 */
+.center-overlay {
+  position: absolute;
+  left: 25%;
+  top: 25%;
+  width: 50%;
+  height: 50%;
+  background: rgba(60, 180, 120, 0.06);
+  border: 1px dashed #bfe3d0;
+  border-radius: 12px;
+  box-shadow: inset 0 0 60px rgba(60, 180, 120, 0.06);
+  padding: 10px;
+}
+.center-overlay .center-content { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: 420px; width: auto; background: transparent; }
+.center-overlay .title { font-weight: 600; margin-bottom: 6px; color: #2a5b46; }
+.center-overlay .kv { border-bottom: none; }
+
+.footer { 
+  /* 中文注释：优化底部额外留白，去除不必要的 margin-bottom */
+  padding: 16px; 
+  border: 1px solid var(--border); 
+  color: var(--muted); 
+  background: var(--panel); 
+  border-radius: 10px; 
+  width: calc(100% - 32px); 
+  margin: 16px auto 0; 
+  max-width: calc(var(--content-max) - 32px);
+}
+
+@media (max-width: 960px) {
+  .container { grid-template-columns: 1fr; }
+  .overview { grid-template-columns: repeat(2, 1fr); }
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+.tag-daxian {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(91, 53, 246, 0.18);
+  font-weight: 600;
+}
+.tag-liunian {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff !important;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(91, 53, 246, 0.18);
+  font-weight: 600;
+}
+.grid-picker { display: grid; grid-template-columns: repeat(5, 1fr); grid-auto-rows: 52px; gap: 8px; }
+.pick-item { display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 8px; background: #f8fafc; color: var(--text); cursor: pointer; user-select: none; padding: 6px 10px; }
+.pick-item.active { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 2px 6px rgba(91, 53, 246, 0.18); }
+.pick-item-daxiang { display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 8px; background: #f8fafc; color: var(--text); cursor: pointer; user-select: none; padding: 2px 4px;width: 60px; }
+.pick-item-daxiang.active { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 2px 6px rgba(91, 53, 246, 0.18); }
+.pick-item .sub { font-size: 11px; opacity: 0.75; margin-left: 6px; }
+.copyline { display: flex; gap: 8px; }
+.copy-input { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+.copyblock .actions { text-align: right; margin-top: 6px; }
+.copyblock .actions.actions-inline { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  justify-content: flex-start; 
+  text-align: left; 
+}
+/* 中文注释：确保“复制”按钮在行内布局中始终靠右对齐 */
+.copyblock .actions.actions-inline .cpyeBtn {
+  margin-left: auto;
+}
+.copy-area { width: 100%; min-height: 200px; max-height: 200px; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; resize: vertical; overflow: auto; white-space: pre-wrap; }
+
+.call-word{width: 100%; margin-top: 16px;}
+
+/* 中文注释：全局提示框（Toast）样式 */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%) translateY(16px);
+  background: var(--text);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px var(--shadow);
+  border: 1px solid var(--border);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+  z-index: 9999;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.toast.success {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.toast.error {
+  background: #a83232;
+  border-color: #ffd9d9;
+}
+
+/* ========= 移动端适配：仅显示表单区域 ========= */
+@media (max-width: 768px) {
+  /* 中文注释：取消桌面端的最小宽度限制，启用移动端内边距 */
+  body {
+    min-width: 0;
+    padding-inline: 12px;
+    /* 中文注释：预留更大的底部安全间隙，避免内容贴边（含刘海屏安全区） */
+    padding-bottom: 32px;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 32px);
+  }
+  /* 中文注释：隐藏头部、结果面板与页脚，仅保留表单面板 */
+  .header,
+  .result-panel,
+  .footer {
+    display: none !important;
+  }
+  /* 中文注释：容器铺满宽度，减少多余间距 */
+  .container {
+    padding: 0;
+    max-width: 100%;
+    margin: 0;
+    gap: 12px;
+    grid-template-columns: 1fr;
+  }
+  /* 中文注释：表单面板紧凑显示 */
+  .form-panel {
+    padding: 12px;
+  }
+  /* 中文注释：表单行在移动端纵向排列，便于触控操作 */
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .form-row label {
+    width: auto;
+  }
+  .segmented {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  /* 中文注释：按钮在移动端默认占满宽度 */
+  .form-actions .btn.primary {
+    width: 100%;
+  }
+  /* 中文注释：提示词区域在移动端缩短初始高度以减少滚动 */
+  .copy-area {
+    min-height: 140px;
+    max-height: 160px;
+  }
+  /* 中文注释：选择器网格在移动端减少每行列数，增大点击区域 */
+  .grid-picker {
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 48px;
+  }
+  /* 中文注释：移动端最后一行操作区（包含“复制”说明与按钮）底部留白 50px */
+  .copyblock .actions.actions-inline {
+    margin-bottom: 80px;
+  }
+  /* 中文注释：隐藏“范围选择”表单行 */
+  #divtype-row {
+    display: none !important;
+  }
+ 
+}
